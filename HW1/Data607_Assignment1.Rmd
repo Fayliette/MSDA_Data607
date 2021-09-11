@@ -1,0 +1,57 @@
+---
+title: "Data607_Assigment1"
+author: "Fayliette Lewis"
+date: "8/29/2021"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+## The article used is "How Baby Boomers Get High"
+Link: https://fivethirtyeight.com/features/how-baby-boomers-get-high/
+
+This article and dataset analyzes a survey that was taken in 2012 on drug use from the federal Substance Abuse and Mental Health Data Archive (SAMHDA) to see what drugs baby boomers are taking. It compares their pattern of use to other age groups. As well as how similar baby boomers are when it comes to drug use.
+ 
+```{r }
+
+# import datset from GitHub
+url <- "https://raw.githubusercontent.com/Fayliette/MSDS_Data607/main/drug-use-by-age.csv"
+
+# Load data set 
+df <- read.csv(url, stringsAsFactors = FALSE)
+
+# Display the first 3 rows of the data set
+head(df, 3)
+
+```
+## Subset of the original data
+This subset excludes the drug use frequency for each age group.
+
+```{r}
+
+# create a subset excluding the use frequency columns
+new_df <- select(df, -contains("frequency"))
+# Display the first 3 rows of the subset
+head(new_df, 3)
+
+```
+
+## Average use
+Which drug has the highest usage average?
+
+```{r}
+# create a subset with only the drug use columns
+drug_use <- subset(new_df[, 3:15])
+head(drug_use, 3)
+# calculate mean for each column of drug use
+avg_use <- sort(colMeans(drug_use), decreasing = TRUE)
+avg_use
+ggplot(data.frame(Mean= avg_use, Drugs = names(avg_use))) +
+     geom_col(aes(Mean, Drugs))
+
+```
+
+
+As seen in the graph above, Alcohol is the drugs individuals use the most.
