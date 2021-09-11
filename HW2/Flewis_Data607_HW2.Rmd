@@ -1,0 +1,128 @@
+---
+title: "FLewis_Data607_HW2"
+author: "Fayliette Lewis"
+date: "9/9/2021"
+output: html_document
+---
+
+
+#### MySQL popular_movie_ratings database
+
+
+```{r}
+library(RMariaDB)
+```
+
+Create a variable to hold the SQL database password.
+
+```{r}
+
+db_password <- "FLdata607"
+
+```
+
+Connect to the database
+
+```{r}
+
+moviesDb <- dbConnect(RMariaDB::MariaDB(), 
+                      user='popular_movie_ratings', 
+                      password=db_password, 
+                      dbname='popular_movies', 
+                      host='localhost')
+
+```
+
+List the names of the tables in the database.
+```{r}
+
+dbListTables(moviesDb)
+
+```
+
+Create a query to show the *audience* table.
+```{r}
+
+audience_table <- dbSendQuery(moviesDb, "SELECT * FROM audience")
+dbFetch(audience_table)
+dbClearResult(audience_table)
+
+```
+
+Create a query to show the *movies* table.
+```{r}
+
+movie_table <- dbSendQuery(moviesDb, "SELECT * FROM movies")
+dbFetch(movie_table)
+dbClearResult(movie_table)
+
+```
+
+Create a query to show the *movie_ratings table*.
+```{r}
+
+ratings <- dbSendQuery(moviesDb, "SELECT * FROM movie_ratings")
+dbFetch(ratings)
+dbClearResult(ratings)
+
+```
+
+Which movie has the most views?
+```{r}
+
+views <- dbSendQuery(moviesDb, "SELECT m.movie_id, 
+          m.movie_name, 
+          m.MPAA_rating, 
+          COUNT(mr.rating) AS num_views
+          FROM movies m
+          JOIN movie_ratings mr USING (movie_id)
+          WHERE rating IS NOT NULL
+          GROUP BY m.movie_id, m.movie_name, m.MPAA_rating
+          ORDER BY m.movie_name")
+dbFetch(views )
+dbClearResult(views)
+
+```
+
+Which movies have ratings >= 4?
+```{r}
+
+ratings4_5 <- dbSendQuery(moviesDb, "SELECT movie_id, 
+              movie_name,
+              MPAA_rating, 
+              rating, 
+              COUNT(rating) AS number_of_ratings
+              FROM movies
+              JOIN movie_ratings USING(movie_id)
+              WHERE rating >= 4
+              GROUP BY movie_id, movie_name, MPAA_rating, rating
+              ORDER BY movie_id")
+dbFetch(ratings4_5)
+dbClearResult(ratings4_5)
+
+```
+
+How many of the six movies did each person watch?
+```{r}
+
+movies_watched <- dbSendQuery(moviesDb, "SELECT a.first_name, 
+                  a.last_name, COUNT(mr.rating) AS num_movies_watched
+                  FROM audience a
+                  JOIN movie_ratings mr USING (audience_id)
+                  WHERE mr.rating IS NOT NULL 
+                  GROUP BY a.first_name, a.last_name
+                  ORDER BY num_movies_watched DESC")
+dbFetch(movies_watched )
+dbClearResult(movies_watched )
+
+```
+
+
+
+
+
+
+
+
+
+
