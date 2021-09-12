@@ -1,0 +1,116 @@
+---
+title: "Data 607 HW 3"
+author: "Fayliette Lewis"
+date: "9/11/2021"
+output: html_document
+---
+
+
+
+```{r, message = FALSE}
+library(tidyverse)
+library(stringr)
+```
+
+##### 1. Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+
+```{r}
+
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv"
+majors_df<- read.csv(url, stringsAsFactors = FALSE)
+head(majors_df)
+
+```
+```{r}
+
+majors_df %>%
+  filter(grepl( "DATA|STATISTICS", Major)) 
+
+```
+
+##### 2. Write code that transforms the data below:  
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"
+
+Into a format like this:
+
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+```{r}
+library(tidyverse)
+library(stringr)
+
+orig_set <- '[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"'
+
+new_set <- c(str_extract_all(orig_set, "[a-z]+ [a-z]+|[a-z]+"))
+new_set
+```
+
+##### 3. Describe, in words, what these expressions will match:
+```{r}
+# regex: (.)\1\1
+# This is supposed to Match any character repeated three times. (i.e. "111", "bbb", "###", etc). However, while this expression may work in other languages, it does not work in R. The correct R expression is "(.)\\1\\1"
+```
+    
+
+```{r}
+# regex: "(.)(.)\\2\\1"
+# 'This expression matches any two characters followed by the same characters in reverse. (i.e. "abba", "5445")
+```
+
+
+```{r}
+# regex: (..)\1
+# This is supposed to matches any two characters repeated once. (i.e. "fafa", "+$+%") However, while this expression may work in other languages, it does not work in R. The correct R expression is "(..)\\1"
+```
+
+
+```{r}
+# regex: "(.).\\1.\\1"
+# This expression matches any five consecutive characters where the first, third, and fifth characters are the same. (i.e. "ababa", "+j+9+")
+```
+```{r}
+# regex: "(.)(.)(.).*\\3\\2\\1"
+# This expression matches six or more consecutive characters where the last three characters are the first three in reverse. (i.e. "abcbca", "1+2klm2+1")
+```
+
+
+##### 4.  Construct regular expressions to match words that:
+
+Start and end with the same character.  
+```{r}
+x<- c("that", "jump", "aba")
+y<- str_subset(x, "(.).*\\1")
+y
+```
+
+
+Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)  
+```{r}
+x<- c("church", "jump", "ToronTo", "chicken")
+y<- str_subset(x, "([A-Za-z][A-Za-z]).*\\1")
+y
+```
+
+
+Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.) 
+```{r}
+x<- c("excellent","jump", "eleven" )
+y<- str_subset(x, "([a-z]).*\\1.*\\1")
+y
+
+```
+
+
+
